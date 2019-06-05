@@ -87,8 +87,8 @@ function format_bnn_article($a) {
     $cols[3] = '0';// ÄnderungsZeit
     $cols[4] = '0';// EANladen
     $cols[5] = '0';// EANbestell
-    $cols[6] = '"' . sanitize_csv($a->name) . '"';
-    $cols[7] = '"' . sanitize_csv($a->note) . '"';
+    $cols[6] = '"' . sanitize_csv(substr($a->name, 0, 50)) . '"';
+    $cols[7] = '"' . sanitize_csv(substr($a->note, 0, 50)) . '"';
 
     // TODO: solve producer key
     // https://github.com/foodcoops/sharedlists/blob/81edeb4445bd80187ff12c4151dd900e1f43bf75/lib/article_import/bnn_codes.yml#L51
@@ -97,8 +97,8 @@ function format_bnn_article($a) {
     //$cols[10] = '"' . get_bnn_producer_key($a->producer) . '"';
     $cols[10] = '';
 
-    $cols[12] = '"' . sanitize_csv($a->origin) . '"';
-    $cols[13] = '"' . sanitize_csv($a->quality) . '"';
+    $cols[12] = '"' . sanitize_csv(substr($a->origin, 0, 3)) . '"';
+    $cols[13] = '"' . sanitize_csv(substr($a->quality, 0, 4)) . '"';
 
     $cols[15] = '0';// MHD-Restlaufzeit
 
@@ -110,9 +110,9 @@ function format_bnn_article($a) {
     $cols[18] = '0';// Warengruppe des jeweiligen Großhändlers
 
     $cols[20] = '1';// MinBestellMenge
-    $cols[21] = '"' . sanitize_csv($unit_quantity . ' x ' . $a->unit) . '"';
+    $cols[21] = '"' . sanitize_csv(substr($unit_quantity . ' x ' . $a->unit, 0, 15)) . '"';
     $cols[22] = $unit_quantity;
-    $cols[23] = '"' . sanitize_csv($a->unit) . '"';
+    $cols[23] = '"' . sanitize_csv(substr($a->unit, 0, 10)) . '"';
     $cols[24] = 1;// Faktor zur Menge-Preis-Relation Ladeneinheit (SIC!!!)
 
     $cols[28] = '0';// GewichtLadeneinheit
@@ -151,7 +151,7 @@ function format_bnn_article($a) {
     $cols[62] = '';// AktionspreisGültigAb (leer = ab sofort)
     $cols[63] = '';// AktionspreisGültigBis (leer = unbestimmt)
     $cols[64] = '';// Aktions-VK-Vorschlag incl. MWSt.
-    $cols[65] = '"' . sanitize_csv($a->unit) . '"';
+    $cols[65] = '"' . sanitize_csv(substr($a->unit, 0, 10)) . '"';
     $cols[66] = 1;// Mengen-Faktor der Grundpreiseinheit zur Ladeneinheit (SIC!!!)
 
     return join(";", $cols) . PHP_EOL;
