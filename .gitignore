@@ -1,0 +1,5 @@
+env.php
+in/*.html
+out/*.BNN
+.idea/*
+laradock-7.9.0/*
