@@ -1,5 +1,7 @@
 # HTML to sharedlist
 
+See: [sharedlist](https://github.com/foodcoops/sharedlists)
+
 ## Environment settings
 
 Datei `./env.php` mit folgendem Inhalt anlegen:
@@ -18,3 +20,8 @@ $kind_sources = array(
    ]
 );
 ```
+
+## Todo
+
+- Warengruppe hinzufügen
+- Inverkehrbringer (Produzent) hinzufügen
