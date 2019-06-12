@@ -96,7 +96,7 @@ function parse_single_article($dom, $xpath, $tr) {
     $article = (object)[];
 
     $article->status = '';
-    $article->deposit = '';
+    $article->deposit = 0.00;
     $article->unit_quantity = '';
 
     $selector = 'ancestor::div[1]/preceding-sibling::h3[1]';

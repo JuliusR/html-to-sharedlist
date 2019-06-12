@@ -1,31 +1,6 @@
 <?php
 
-function sanitize_csv($str) {
-    $fix = array(
-        '"' => '""'
-    );
-
-    return str_replace(array_keys($fix), array_values($fix), $str);
-}
-
-function format_article_csv($a) {
-    return ""
-        . '"' . sanitize_csv($a->status) . '";'
-        . '"' . sanitize_csv($a->id) . '";'
-        . '"' . sanitize_csv($a->name) . '";'
-        . '"' . sanitize_csv($a->quality) . '";'
-        . '"' . sanitize_csv($a->producer) . '";'
-        . '"' . sanitize_csv($a->origin) . '";'
-        . '"' . sanitize_csv($a->unit) . '";'
-        . number_format($a->single_price, 2) . ';'
-        . $a->tax . ';'
-        . $a->deposit . ';'
-        . $a->unit_quantity . ';'
-        . '"' . '' . '";'
-        . '"' . '' . '";'
-        . '"' . sanitize_csv($a->category) . '";'
-        . PHP_EOL;
-}
+require_once("format_csv.php");
 
 function get_bnn_tax_key($tax) {
     // Mehrwertsteuer 1=reduziert 2=voll 3=LandwirtsSatz
