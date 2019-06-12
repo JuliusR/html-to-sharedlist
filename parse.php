@@ -80,6 +80,25 @@ function polish_article($a) {
     return $a;
 }
 
+function polish_article_producer($producer_or_key) {
+    $producer_or_key = mb_trim($producer_or_key);
+
+    if(empty($producer_or_key) || !is_uppercase($producer_or_key))  {
+        return $producer_or_key;
+    }
+
+    $key = $producer_or_key;
+    $producers = $GLOBALS['producers'];
+
+    if(isset($producers[$key])) {
+        return $producers[$key];
+    }
+
+    $GLOBALS['missing_producer_keys'][] = $key;
+
+    return $key;
+}
+
 function parse_single_article($dom, $xpath, $tr) {
     $article = (object)[];
 
@@ -109,7 +128,7 @@ function parse_single_article($dom, $xpath, $tr) {
 
     $cells = $xpath->query('.//tr//td', $details);
     $article->quality = $cells->item(3)->textContent;
-    $article->producer = $cells->item(7)->textContent;
+    $article->producer = polish_article_producer($cells->item(7)->textContent);
     $article->origin = $cells->item(12)->textContent;
     $article->additives = $cells->item(16)->textContent;
     $article->note = $cells->item(21)->textContent;

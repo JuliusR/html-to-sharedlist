@@ -19,9 +19,17 @@ $kind_sources = array(
        'https://url.de/abc4'
    ]
 );
+
+$producers = [
+    'APR' => 'Producer A',
+    'BPR' => 'Producer B',
+    'CPR' => 'Producer C'
+];
+
 ```
 
 ## Todo
 
-- Warengruppe hinzufügen
-- Inverkehrbringer (Produzent) hinzufügen
+- [x] Warengruppe hinzufügen (done for CSV only)
+- [x] Inverkehrbringer (Produzent) hinzufügen (done for CSV only)
+- [ ] restrict to CSV output (drop support of BNN3 format)
