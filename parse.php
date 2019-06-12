@@ -36,55 +36,58 @@ function prepare_markup($html) {
     return $html;
 }
 
+function polish_article_with_kg_price($a) {
+    if(!starts_with($a->single_price, '*')) die('PROBLEM');
+    $a->single_price = mb_trim(substr($a->single_price, 1));
+
+    $price = str_replace(',', '.', $a->single_price);
+    $price = floatval($price);
+    if($a->single_price != number_format($price, 2, ',', '')) die('PROBLEM');
+
+    $a->unit = str_replace(',', '.', $a->unit);
+    $unit_quantity = floatval(substr($a->unit, 0, -2));
+    if($a->unit != $unit_quantity . 'kg') die('PROBLEM');
+
+    $a->unit = '1kg';
+    $a->unit_quantity = $unit_quantity;
+    $a->single_price = $price;
+
+    return $a;
+}
+
+
 function polish_article($a) {
     $a->category = str_replace(",", "", $a->category);
 
-    $a->unit = str_replace(",", ".", $a->unit);
-    $a->single_price = str_replace(",", ".", $a->single_price);
-    $a->tax = str_replace(",", ".", $a->tax);
+    $total_price = str_replace(",", ".", $a->total_price);
+    $total_price = floatval($total_price);
+    if($a->total_price != number_format($total_price, 2, ',', '')) die('PROBLEM');
+    $a->total_price = $total_price;
 
-    $tax = floatval($a->tax);
-    if($a->tax != number_format($tax, 2)) die('PROBLEM');
+    $tax = str_replace(",", ".", $a->tax);
+    $tax = floatval($tax);
+    if($a->tax != number_format($tax, 2, ',', '')) die('PROBLEM');
     $a->tax = $tax;
 
-    $price = $a->single_price;
-    if(starts_with($price, '*')) {// price per kg
-        $price = mb_trim(substr($price, 1));
-
-        $price_per_1kg = floatval($price);
-        if($price != number_format($price_per_1kg, 2)) die('PROBLEM');
-
-        $unit_quantity = floatval(substr($a->unit, 0, -2));
-        if($a->unit != $unit_quantity . 'kg') die('PROBLEM');
-
-        $a->unit = '1kg';
-        $a->unit_quantity = $unit_quantity;
-        $a->single_price = $price_per_1kg;
-
-        return $a;
+    if(starts_with($a->single_price, '*')) {
+        return polish_article_with_kg_price($a);
     }
 
+    $a->unit_quantity = 1;
+    $a->single_price = $a->total_price / (1. + $a->tax/100.);
+
     $pattern = '/\A(\d+)x(\d.*)\z/';
-    if(preg_match($pattern, $a->unit, $ms)) {
+    if(preg_match($pattern, $a->unit, $ms)) {// [unit_quantity]x[unit]
         $unit_quantity = intval($ms[1]);
         $unit = $ms[2];
         if($a->unit != $unit_quantity . 'x' . $unit) die('PROBLEM');
 
-        $price_per_unit = floatval($price);
-        if($price != number_format($price_per_unit, 2)) die('PROBLEM');
-
         $a->unit = $unit;
         $a->unit_quantity = $unit_quantity;
-        $a->single_price = $price_per_unit;
-
-        return $a;
+        $a->single_price = $a->single_price / $unit_quantity;
     }
 
-    $price_per_unit = floatval($price);
-    if($price != number_format($price_per_unit, 2)) die('PROBLEM');
-
-    $a->unit_quantity = 1;
-    $a->single_price = $price_per_unit;
+    $a->unit = str_replace(',', '.', $a->unit);// yes, it is a mess... (currently)
 
     return $a;
 }
