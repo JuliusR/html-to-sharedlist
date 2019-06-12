@@ -2,29 +2,38 @@
 
 require_once("util.php");
 
-function fix_markup_errors($html) {
-    $fix = array(
-        '& ' => '&amp; ',
-        '&Walnuss' => '&amp;Walnuss',
-        '&gesalzen' => '&amp;gesalzen',
-        ' &Co<' => ' &amp;Co<',
-        '&Sirup<' => '&amp;Sirup<',
-        '&Snacks<' => '&amp;Snacks<',
-        '&Papayast' => '&amp;Papayast',
-        'frisch&Fruchtig' => 'frisch&amp;Fruchtig',
-        '&PannaCotta' => '&amp;PannaCotta',
-        'W&S ' => 'W&amp;S ',
-        '<5%Xantan' => '&lt;5%Xantan',
-        '<5% nichtionische' => '&lt;5% nichtionische',
-        '&Zubehör' => '&amp;Zubehör',
-        '&hg=' => '&amp;hg=',
-        '&p=' => '&amp;p=',
-        '&partner=' => '&amp;partner=',
-        '&ean=' => '&amp;ean=',
-        'Limone &Verveine' => 'Limone &amp;Verveine'
-    );
+function prepare_markup($html) {
+    // replace `&` by `&amp;` if the ampersand is not part of a
+    // [named|decimal|hex] character reference
+    //
+    // https://html.spec.whatwg.org/multipage/syntax.html#character-references
+    $dec = '(?:#\d+)';
+    $hex = '(?:#[xX][a-fA-F0-9]+)';
+    $named = '(?:[A-Za-z]+)';// https://html.spec.whatwg.org/entities.json
+    $charref = '(?:' . join('|', [$dec, $hex, $named]) . ')';
 
-    return str_replace(array_keys($fix), array_values($fix), $html);
+    $ampersand = '&(?!' . $charref . ';)';
+    $html = preg_replace("@$ampersand@", '&amp;', $html);
+
+    // replace `<` by `&lt;` if the less-than sign is neither part of
+    // the doctype nor part of an HTML tag
+    //
+    // doctype starts with `!`; HTML tags start with a letter or `/`
+    $lt = '<(?![a-zA-Z/!])';
+    $lt_analyze = '.{0,20}' . $lt . '.{0,20}';// print some context in warning
+
+    preg_match_all("@$lt_analyze@", $html, $ms);
+    $expected_lt_count = count($ms[0]);
+    if($expected_lt_count >= 1) {
+        echo "WARNING: replacing some less-than symbols.<br />\n";
+        var_dump($ms[0]);
+    }
+    $html = preg_replace("@$lt@", '&lt;', $html, -1, $real_lt_count);
+    if($expected_lt_count !== $real_lt_count) {
+        die('ERROR: I messed up with the less-than symbols.');
+    }
+
+    return $html;
 }
 
 function polish_article($a) {
@@ -123,7 +132,7 @@ function parse_single_article($dom, $xpath, $tr) {
 }
 
 function parse_articles($html) {
-    $html = fix_markup_errors($html);
+    $html = prepare_markup($html);
 
     $dom = new DOMDocument();
     $dom->loadHTML($html);
