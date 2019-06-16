@@ -1,1 +1,8 @@
 Options -Indexes
+
+Order Deny,Allow
+deny from all
+
+<FilesMatch "\A(index\.php)?\z">
+        Allow from All
+</FilesMatch>
