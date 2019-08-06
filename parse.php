@@ -59,7 +59,8 @@ function polish_article_with_kg_price($a) {
 function polish_article($a) {
     $a->category = str_replace(",", "", $a->category);
 
-    $total_price = str_replace(",", ".", $a->total_price);
+    $total_price = str_replace(".", "", $a->total_price);
+    $total_price = str_replace(",", ".", $total_price);
     $total_price = floatval($total_price);
     if($a->total_price != number_format($total_price, 2, ',', '')) die('PROBLEM');
     $a->total_price = $total_price;
